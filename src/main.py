@@ -56,3 +56,37 @@ class HhRuAPI(AbstractJobSiteAPI):
         return jobs
 
 
+from abc import ABC, abstractmethod
+
+class AbstractFileHandler(ABC):
+    """
+    Абстрактный класс для работы с файлами.
+    """
+
+    @abstractmethod
+    def add_jobs(self, jobs):
+        """
+        Метод для добавления вакансий в файл.
+
+        :param jobs: Список вакансий.
+        """
+        pass
+
+    @abstractmethod
+    def get_jobs(self, search_params):
+        """
+        Метод для получения данных из файла по указанным критериям.
+
+        :param search_params: Параметры поиска вакансий.
+        :return: Список вакансий.
+        """
+        pass
+
+    @abstractmethod
+    def delete_jobs(self, search_params):
+        """
+        Метод для удаления информации о вакансиях.
+
+        :param search_params: Параметры поиска вакансий.
+        """
+        pass
