@@ -23,9 +23,10 @@ class AbstractJobSiteAPI(ABC):
         """
         pass
 
-
-
-
+#
+#
+#
+#
 
 class HhRuAPI(AbstractJobSiteAPI):
     """
@@ -55,8 +56,6 @@ class HhRuAPI(AbstractJobSiteAPI):
 
         return jobs
 
-
-from abc import ABC, abstractmethod
 
 class AbstractFileHandler(ABC):
     """
