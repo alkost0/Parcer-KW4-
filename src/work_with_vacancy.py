@@ -2,46 +2,63 @@ class Job:
     """
     Класс для работы с вакансиями.
     """
-
     def __init__(self, title, link, salary, description):
         self.title = title
         self.link = link
-        self.salary = salary
+        self.__salary = salary
         self.description = description
 
+    @property
+    def salary(self):
+        return self.__salary
+
     def __repr__(self):
-        return f"Job(title='{self.title}', salary='{self.salary}')"
+        """
+        Тут и ниже - различные дандер-методы для работы с зарплатами вакансий
+        """
+        return f"Job(title='{self.title}', salary='{self.__salary}')"
 
     def __eq__(self, other):
-        return self.salary == other.salary
+        return self.__salary == other.__salary
+    def __str__(self):
+        return f"'название': {self.title}, 'ссылка': {self.link}, 'зарплата': {self.__salary}, 'описание': {self.description}"
 
     def __lt__(self, other):
-        return self.salary < other.salary
+        if isinstance(other, self.__class__):
+            return self.__salary < other.__salary
+        raise ValueError("Сравнивать можно только по зарплате вакансии")
 
-    def validate_salary(self):
-        """
-        Проверка валидности зарплаты.
-        """
-        # здесь может быть ваш код для проверки валидности данных
-        pass
+    def __le__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__salary <= other.__salary
+        raise ValueError("Сравнивать можно только по зарплате вакансии")
 
-    def validate_link(self):
-        """
-        Проверка валидности ссылки на вакансию.
-        """
-        # здесь может быть ваш код для проверки валидности данных
-        pass
+    def __gt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__salary > other.__salary
+        raise ValueError("Сравнивать можно только по зарплате вакансии")
 
-    def validate_title(self):
-        """
-        Проверка валидности названия вакансии.
-        """
-        # здесь может быть ваш код для проверки валидности данных
-        pass
+    def __ge__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__salary >= other.__salary
+        raise ValueError("Сравнивать можно только по зарплате вакансии")
 
-    def validate_description(self):
+    @staticmethod
+    def validate_salary(salary):
         """
-        Проверка валидности описания вакансии.
+         Проверка валидности зарплаты.
+         """
+        if salary is None:
+            return 0
+        return salary
+
+    @staticmethod
+    def validate_description(description):
         """
-        # здесь может быть ваш код для проверки валидности данных
-        pass
+         Проверка валидности описания вакансии.
+         """
+        if "<highlighttext>" in description or "</highlighttext>" in description:
+            new_description = description.replace("<highlighttext>", "")
+            new_description = new_description.replace("</highlighttext>", "")
+            return new_description
+        return description
