@@ -6,15 +6,6 @@ class AbstractFileHandler(ABC):
     Абстрактный класс для работы с файлами.
     """
     @abstractmethod
-    def add_jobs(self, jobs):
-        """
-        Метод для добавления вакансий в файл.
-
-        :param jobs: Список вакансий.
-        """
-        pass
-
-    @abstractmethod
     def get_jobs(self, vacancy):
         """
         Метод для получения данных из файла по указанным критериям.

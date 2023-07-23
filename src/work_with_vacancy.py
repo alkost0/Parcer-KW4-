@@ -1,6 +1,6 @@
 class Job:
     """
-    Класс для работы с вакансиями.
+    Класс для работы с вакансиями
     """
     def __init__(self, title, link, salary, description):
         self.title = title

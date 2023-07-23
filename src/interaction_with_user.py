@@ -1,41 +1,122 @@
-def search_jobs():
+from src.main import HhRuAPI, SuperJobRuAPI
+from src.save_to_json import Save_to_Json
+from src.work_with_vacancy import Job
+
+
+def get_hh_jobs(hh_data):
     """
-    Функция для взаимодействия с пользователем и поиска вакансий.
+    Выборка вакансий из HeadHunter
     """
-    # Список поддерживаемых платформ
-    platforms = ['HH', 'Superjob']
+    vacancies = []
+    for hh_vacancy in hh_data:
+        try:
+            title = hh_vacancy['name']
+            link = hh_vacancy['alternate_link']
+            salary = hh_vacancy['salary'].get('from')
+            if hh_vacancy['snippet']['description'] is None:
+                description = "Описание не указано"
+            else:
+                description = hh_vacancy['snippet']['description']
+        except AttributeError:
+            title = hh_vacancy['name']
+            link = hh_vacancy['alternate_link']
+            salary = None
+            if hh_vacancy['snippet']['description'] is None:
+                description = "Описание не указано"
+            else:
+                description = hh_vacancy['snippet']['description']
 
-    # Запрашиваем у пользователя параметры поиска
-    platform = input(f"Укажите платформу ({', '.join(platforms)}): ")
-    while platform not in platforms:
-        platform = input(f"Неверная платформа. Укажите платформу ({', '.join(platforms)}): ")
+        validate_salary = Job.validate_salary(salary)
+        validate_description = Job.validate_description(description)
+        hh_vacancy_done = Job(title, link, validate_salary, validate_description)
+        vacancies.append(hh_vacancy_done)
+    return vacancies
 
-    query = input("Введите поисковый запрос: ")
+def get_superjob_jobs(superjob_data):
+    """
+    Выборка вакансий из SuperJob
+    """
+    vacancies = []
+    for superjob_vacancy in superjob_data:
+        try:
+            title = superjob_vacancy['profession']
+            link = superjob_vacancy['link']
+            salary = superjob_vacancy['payment_from']
+            description = superjob_vacancy['candidat']
+        except AttributeError:
+            title = superjob_vacancy['profession']
+            link = superjob_vacancy['link']
+            salary = None
+            description = superjob_vacancy['candidat']
 
-    # Создаем объект для работы с соответствующей платформой
-    if platform == 'HH':
-        scraper = HhScraper()
-    elif platform == 'Superjob':
-        scraper = SuperjobScraper()
+        validate_salary = Job.validate_salary(salary)
+        validate_description = Job.validate_description(description)
+        superjob_vacancy_done = Job(title, link, validate_salary, validate_description)
+        vacancies.append(superjob_vacancy_done)
+    return vacancies
 
-    # Получаем список вакансий
-    jobs = scraper.search_jobs(query)
+def interaction_with_user(save_json: Save_to_Json):
+    """
+    Функция взаимодействия с пользователем
+    """
+    hh_vacancies = HhRuAPI()
+    superjob_vacancies = SuperJobRuAPI()
 
-    # Запрашиваем у пользователя, как он хочет отсортировать вакансии
-    sort_order = input("Укажите порядок сортировки (asc/desc): ")
-    while sort_order not in ['asc', 'desc']:
-        sort_order = input("Неверный порядок сортировки. Укажите порядок сортировки (asc/desc): ")
+    while True:
+        user_input = input("Выберите где ищем вакансии: 1 - HeadHunter, 2 - SuperJob")
+        search_word = input("Введите ключевое слово для поиска: ")
+        if user_input == "1":
+            hh_data = hh_vacancies.get_jobs(search_word)["items"]
+            vacancies = get_hh_jobs(hh_data)
+            break
+        elif user_input == "2":
+            superjob_data = superjob_vacancies.get_jobs(search_word)["objects"]
+            vacancies = get_superjob_jobs(superjob_data)
+            break
+        else:
+            print("Неверный ввод! Введите 1 или 2")
+    save_json.get_jobs(vacancies)
+    while True:
+        print('Выберите одно из доступных действий:')
+        print('1 - Получить список всех вакансий')
+        print('2 - Удалить вакансию')
+        print('3 - Получить список вакансий по ключевым словам')
+        print('4 - Получить список вакансий с зарплатой выше указанной')
+        print('5 - Получить топ N вакансий по зарплате')
+        print('6 - Выход')
 
-    # Сортируем вакансии по зарплате
-    jobs = sorted(jobs, key=lambda job: job.salary, reverse=(sort_order == 'desc'))
+        choice = input('> ')
+        if choice == '1':
+            for vacancy in vacancies:
+                print(vacancy)
+                print()
+        elif choice == '2':
+            vacancy = input("Введите ссылку удаляемой вакансии: ")
+            save_json.delete_jobs(vacancy)
+            print('Вакансия удалена!')
+        elif choice == '3':
+            filter_words = input('Введите ключевые слова для фильтрации вакансий: ')
+            for vacancy in vacancies:
+                if filter_words in vacancy.description:
+                    print(vacancy)
+                    print()
+        elif choice == '4':
+            min_salary = float(input('Введите минимальную зарплату: '))
+            for vacancy in vacancies:
+                if min_salary < float(vacancy.salary):
+                    print(vacancy)
+                    print()
+        elif choice == '5':
+            top_n = int(input("Введите количество вакансий для вывода в топ N: "))
+            sorted_vacancies = sorted(vacancies, reverse=True)
+            for vacancy in sorted_vacancies[:top_n]:
+                print(vacancy)
+                print()
+        elif choice == '6':
+            break
+        else:
+            print('Некорректный ввод!')
 
-    # Запрашиваем у пользователя, сколько вакансий он хочет увидеть
-    num_jobs = input("Сколько вакансий вы хотите увидеть? ")
-    while not num_jobs.isdigit():
-        num_jobs = input("Неверное количество. Сколько вакансий вы хотите увидеть? ")
-    num_jobs = int(num_jobs)
-
-    # Выводим топ N вакансий по зарплате
-    print(f"Топ {num_jobs} вакансий по зарплате:")
-    for job in jobs[:num_jobs]:
-        print(job)
+if __name__ == "__main__":
+    save_json = Save_to_Json()
+    interaction_with_user(save_json)
