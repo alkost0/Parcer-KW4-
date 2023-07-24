@@ -28,13 +28,12 @@ class HhRuAPI(AbstractJobSiteAPI):
     """
     Класс для работы с API сайта hh.ru.
     """
-    def get_jobs(self, search_params):
+    def get_jobs(self, vacancy):
         """
         Получение вакансий с сайта hh.ru.
         """
         # Отправляем запрос к API сайта hh.ru и получаем список вакансий.
-        def get_jobs(self, vacancy):
-            hh_dict = {}
+        hh_dict = {}
             for page in range(0, 3):
                 params = {
                     "text": vacancy,

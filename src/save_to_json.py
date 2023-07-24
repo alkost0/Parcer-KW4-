@@ -17,8 +17,8 @@ class AbstractFileHandler(ABC):
     def delete_jobs(self, vacancy):
         """
         Метод для удаления информации о вакансиях.
-       """
-       pass
+        """
+        pass
 
 class Save_to_Json(AbstractFileHandler):
 
@@ -39,6 +39,9 @@ class Save_to_Json(AbstractFileHandler):
             json.dump(data, file, ensure_ascii=False, indent=2)
 
     def delete_jobs(self, vacancy):
+        """
+        Удаляем вакансию, перезаписывая json-файл (подгружаем, меняем, записываем/сохраняем новым)
+        """
         with open("../src/vacancy.json", "r", encoding="utf-8") as file:
             vacancies = json.load(file)
             new_vacancies = [vac for vac in vacancies if vacancy not in vac.values()]
