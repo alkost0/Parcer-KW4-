@@ -11,7 +11,7 @@ def get_hh_jobs(hh_data):
     for hh_vacancy in hh_data:
         try:
             title = hh_vacancy['name']
-            link = hh_vacancy['alternate_link']
+            link = hh_vacancy['apply_alternate_url']
             salary = hh_vacancy['salary'].get('from')
             if hh_vacancy['snippet']['description'] is None:
                 description = "Описание не указано"
@@ -19,7 +19,7 @@ def get_hh_jobs(hh_data):
                 description = hh_vacancy['snippet']['description']
         except AttributeError:
             title = hh_vacancy['name']
-            link = hh_vacancy['alternate_link']
+            link = hh_vacancy['apply_alternate_url']
             salary = None
             if hh_vacancy['snippet']['description'] is None:
                 description = "Описание не указано"
@@ -63,7 +63,7 @@ def interaction_with_user(save_json: Save_to_Json):
     superjob_vacancies = SuperJobRuAPI()
 
     while True:
-        user_input = input("Выберите где ищем вакансии: 1 - HeadHunter, 2 - SuperJob")
+        user_input = input("Выберите где ищем вакансии: 1 - HeadHunter, 2 - SuperJob ")
         search_word = input("Введите ключевое слово для поиска: ")
         if user_input == "1":
             hh_data = hh_vacancies.get_jobs(search_word)["items"]
