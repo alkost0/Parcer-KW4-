@@ -13,18 +13,18 @@ def get_hh_jobs(hh_data):
             title = hh_vacancy['name']
             link = hh_vacancy['apply_alternate_url']
             salary = hh_vacancy['salary'].get('from')
-            if hh_vacancy['snippet']['description'] is None:
+            if hh_vacancy['snippet']['requirement'] is None:
                 description = "Описание не указано"
             else:
-                description = hh_vacancy['snippet']['description']
+                description = hh_vacancy['snippet']['requirement']
         except AttributeError:
             title = hh_vacancy['name']
             link = hh_vacancy['apply_alternate_url']
             salary = None
-            if hh_vacancy['snippet']['description'] is None:
+            if hh_vacancy['snippet']['requirement'] is None:
                 description = "Описание не указано"
             else:
-                description = hh_vacancy['snippet']['description']
+                description = hh_vacancy['snippet']['requirement']
 
         validate_salary = Job.validate_salary(salary)
         validate_description = Job.validate_description(description)
